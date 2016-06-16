@@ -25,10 +25,8 @@ public class TwitterKafkaProducer {
     Properties properties = new Properties();
     properties.put("metadata.broker.list", "localhost:9092");
     properties.put("serializer.class", "kafka.serializer.StringEncoder");
-    properties.put("client.id","camus");
     ProducerConfig producerConfig = new ProducerConfig(properties);
-    kafka.javaapi.producer.Producer<String, String> producer = new kafka.javaapi.producer.Producer<String, String>(
-    		producerConfig);
+    kafka.javaapi.producer.Producer<String, String> producer = new kafka.javaapi.producer.Producer<String, String>( producerConfig);
 
     // Create an appropriately sized blocking queue
     BlockingQueue<String> queue = new LinkedBlockingQueue<String>(10000);
@@ -43,7 +41,7 @@ public class TwitterKafkaProducer {
 
     // Create a new BasicClient. By default gzip is enabled.
     BasicClient client = new ClientBuilder()
-            .name("sampleExampleClient")
+            .name("twitterTrackerClient")
             .hosts(Constants.STREAM_HOST)
             .endpoint(endpoint)
             .authentication(auth)
@@ -54,7 +52,8 @@ public class TwitterKafkaProducer {
     client.connect();
 
     // Do whatever needs to be done with messages
-    for (int msgRead = 0; msgRead < 1000; msgRead++) {
+    //for (int msgRead = 0; msgRead < 1000; msgRead++) {
+    while(true) {
       if (client.isDone()) {
         System.out.println("Client connection closed unexpectedly: " + client.getExitEvent().getMessage());
         break;
