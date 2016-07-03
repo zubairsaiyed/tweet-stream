@@ -2,12 +2,15 @@ package com.zubairsaiyed.twitter;
 
 import java.io.IOException;
 import java.io.InputStream;
+import com.google.common.collect.Lists;
+import java.util.List;
 import java.util.Properties;
 import kafka.producer.KeyedMessage;
 import kafka.producer.ProducerConfig;
 
 import com.twitter.hbc.ClientBuilder;
 import com.twitter.hbc.core.Constants;
+import com.twitter.hbc.core.endpoint.StatusesFilterEndpoint;
 import com.twitter.hbc.core.endpoint.StatusesSampleEndpoint;
 import com.twitter.hbc.core.processor.StringDelimitedProcessor;
 import com.twitter.hbc.httpclient.BasicClient;
@@ -18,7 +21,7 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
-public class TwitterKafkaProducer {
+public class TwitterTopicKafkaProducer {
 
   private static final String topic = "twitter-topic";
   private static Properties prop;
@@ -33,13 +36,17 @@ public class TwitterKafkaProducer {
     // Create an appropriately sized blocking queue
     BlockingQueue<String> queue = new LinkedBlockingQueue<String>(10000);
 
+    List<String> terms = Lists.newArrayList("trump", "hillary", "bernie", "brexit");
+
     // Define our endpoint: By default, delimited=length is set (we need this for our processor)
     // and stall warnings are on.
-    StatusesSampleEndpoint endpoint = new StatusesSampleEndpoint();
+    StatusesFilterEndpoint endpoint = new StatusesFilterEndpoint();
     endpoint.stallWarnings(false);
+    endpoint.trackTerms(terms);
 
     Authentication auth = new OAuth1(consumerKey, consumerSecret, token, secret);
     //Authentication auth = new com.twitter.hbc.httpclient.auth.BasicAuth(username, password);
+
 
     // Create a new BasicClient. By default gzip is enabled.
     BasicClient client = new ClientBuilder()
@@ -85,9 +92,9 @@ public class TwitterKafkaProducer {
 
   public static void main(String[] args) {
     prop = new Properties();
-    try (InputStream input = TwitterKafkaProducer.class.getClassLoader().getResourceAsStream("config.properties")) {
+    try (InputStream input = TwitterTopicKafkaProducer.class.getClassLoader().getResourceAsStream("config.properties")) {
         prop.load(input);
-        TwitterKafkaProducer.run(prop.getProperty("twitter_api_key"),prop.getProperty("twitter_api_secret"),prop.getProperty("twitter_access_token"),prop.getProperty("twitter_access_token_secret"));
+        TwitterTopicKafkaProducer.run(prop.getProperty("twitter_api_key"),prop.getProperty("twitter_api_secret"),prop.getProperty("twitter_access_token"),prop.getProperty("twitter_access_token_secret"));
     } catch (Exception ex) {
         ex.printStackTrace();
     }
