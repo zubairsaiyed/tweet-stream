@@ -1,5 +1,8 @@
 package com.zubairsaiyed.twitter;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.IOException;
 import java.io.InputStream;
 import com.google.common.collect.Lists;
@@ -23,6 +26,7 @@ import java.util.concurrent.TimeUnit;
 
 public class TwitterTopicKafkaProducer {
 
+  private static final Logger logger = LoggerFactory.getLogger(TwitterTopicKafkaProducer.class);
   private static final String topic = "twitter-topic";
   private static Properties prop;
 
@@ -64,15 +68,15 @@ public class TwitterTopicKafkaProducer {
     //for (int msgRead = 0; msgRead < 1000; msgRead++) {
     while(true) {
       if (client.isDone()) {
-        System.out.println("Client connection closed unexpectedly: " + client.getExitEvent().getMessage());
+        logger.debug("Client connection closed unexpectedly: " + client.getExitEvent().getMessage());
         break;
       }
 
       String msg = queue.poll(5, TimeUnit.SECONDS);
       if (msg == null) {
-        System.out.println("Did not receive a message in 5 seconds");
+        logger.debug("Did not receive a message in 5 seconds");
       } else {
-        System.out.println(msg);
+        logger.debug(msg);
 	KeyedMessage<String, String> message = null;
 	try {
 		message = new KeyedMessage<String, String>(topic, queue.take());
