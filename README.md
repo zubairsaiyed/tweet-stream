@@ -11,7 +11,7 @@ Additionally, a SampleStreamExample is contained which simply validates Twitter 
 
 ## Requirements :
 
-* Apache Kafka 1.0.1
+* Apache Kafka v0.8.1.1
 * Twitter Developer account (for API Key, Secret etc.)
 * Apache Maven
 * Oracle JDK 1.7 (64 bit)
